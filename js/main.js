@@ -141,6 +141,27 @@ class Boid {
       return steering;
     }
 
+    avoidPredator(predator) {
+        let desiredSeparation = 100; // Distance at which boids start evading the predator
+        let steer = new Vector(0, 0);
+        let distance = Vector.distance(this.position, predator.position);
+    
+        if (distance < desiredSeparation) {
+            let diff = Vector.subtract(this.position, predator.position);
+            diff.normalize();
+            diff.divide(distance); // Weight by distance
+            steer.add(diff);
+        }
+    
+        if (steer.magnitude() > 0) {
+            steer.normalize();
+            steer.multiply(this.maxSpeed);
+            steer.subtract(this.velocity);
+            steer.limit(this.maxForce);
+        }
+        return steer;
+    }
+
     draw(ctx) {
         const angle = Math.atan2(this.velocity.y, this.velocity.x);
         const size = 10; // Define the size of the triangle representing the boid
@@ -179,6 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const boundary = new Boundary(canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2);
   let quadTree = new QuadTree(boundary, 4); // Adjust capacity as needed
 
+  // Instantiate the predator
+  let predator = new Predator(canvas.width / 2, canvas.height / 2); // Example starting position
+
   // Create boids
   let boids = [];
   for (let i = 0; i < 500; i++) { // Adjust number of boids as needed
@@ -197,11 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
       // Update and draw each boid
       boids.forEach(boid => {
+        // react to predator
+        let evadeForce = boid.avoidPredator(predator);
+        boid.applyForce(evadeForce);
+        
         boid.flock(quadTree);
         boid.update();
         boid.handleEdges(canvas.width, canvas.height);
         boid.draw(ctx); // Assuming a draw method is implemented in the Boid class
       });
+
+        // Update and draw the predator
+        predator.update(); 
+        predator.handleEdges(canvas.width, canvas.height);
+        predator.draw(ctx);
     
       requestAnimationFrame(updateSimulation); // Loop the simulation
     }
