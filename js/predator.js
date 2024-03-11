@@ -42,13 +42,13 @@ class Predator {
 
     draw(ctx) {
       // Body
-      ctx.fillStyle = 'red'; // A striking color
+      ctx.fillStyle = 'rgba(235, 247, 2, .8)'; // A striking color
       ctx.beginPath();
       ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
       ctx.fill();
 
       // Eyes
-      ctx.fillStyle = 'white'; // Eyes that stand out
+      ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Eyes that stand out
       let angle = Math.atan2(this.velocity.y, this.velocity.x);
       let eyeDistance = this.radius / 2.5; // Distance of eyes from the center
       let eyeRadius = this.radius / 5; // Size of the eyes
